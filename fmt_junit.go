@@ -45,7 +45,7 @@ func (j *junitFormatter) Feature(feature *gherkin.Feature, path string, c []byte
 	}
 
 	if len(j.suite.TestSuites) > 0 {
-		j.current().Time = timeNowFunc().Sub(j.featStarted).String()
+		j.current().Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.featStarted).Seconds())
 	}
 	j.featStarted = timeNowFunc()
 	j.suite.TestSuites = append(j.suite.TestSuites, testSuite)
@@ -86,7 +86,7 @@ func (j *junitFormatter) Failed(step *gherkin.Step, match *StepDef, err error) {
 	j.suite.Failures++
 
 	tcase := suite.current()
-	tcase.Time = timeNowFunc().Sub(j.caseStarted).String()
+	tcase.Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.caseStarted).Seconds())
 	tcase.Status = "failed"
 	tcase.Failure = &junitFailure{
 		Message: fmt.Sprintf("%s %s: %s", step.Type, step.Text, err.Error()),
@@ -97,7 +97,7 @@ func (j *junitFormatter) Passed(step *gherkin.Step, match *StepDef) {
 	suite := j.current()
 
 	tcase := suite.current()
-	tcase.Time = timeNowFunc().Sub(j.caseStarted).String()
+	tcase.Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.caseStarted).Seconds())
 	tcase.Status = "passed"
 }
 
@@ -105,7 +105,7 @@ func (j *junitFormatter) Skipped(step *gherkin.Step, match *StepDef) {
 	suite := j.current()
 
 	tcase := suite.current()
-	tcase.Time = timeNowFunc().Sub(j.caseStarted).String()
+	tcase.Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.caseStarted).Seconds())
 	tcase.Error = append(tcase.Error, &junitError{
 		Type:    "skipped",
 		Message: fmt.Sprintf("%s %s", step.Type, step.Text),
@@ -121,7 +121,7 @@ func (j *junitFormatter) Undefined(step *gherkin.Step, match *StepDef) {
 		j.suite.Errors++
 	}
 
-	tcase.Time = timeNowFunc().Sub(j.caseStarted).String()
+	tcase.Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.caseStarted).Seconds())
 	tcase.Status = "undefined"
 	tcase.Error = append(tcase.Error, &junitError{
 		Type:    "undefined",
@@ -135,7 +135,7 @@ func (j *junitFormatter) Pending(step *gherkin.Step, match *StepDef) {
 	j.suite.Errors++
 
 	tcase := suite.current()
-	tcase.Time = timeNowFunc().Sub(j.caseStarted).String()
+	tcase.Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.caseStarted).Seconds())
 	tcase.Status = "pending"
 	tcase.Error = append(tcase.Error, &junitError{
 		Type:    "pending",
@@ -145,9 +145,9 @@ func (j *junitFormatter) Pending(step *gherkin.Step, match *StepDef) {
 
 func (j *junitFormatter) Summary() {
 	if j.current() != nil {
-		j.current().Time = timeNowFunc().Sub(j.featStarted).String()
+		j.current().Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.featStarted).Seconds())
 	}
-	j.suite.Time = timeNowFunc().Sub(j.started).String()
+	j.suite.Time = fmt.Sprintf("%f", timeNowFunc().Sub(j.started).Seconds())
 	_, err := io.WriteString(j.out, xml.Header)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "failed to write junit string:", err)
